@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shivam Moto – Used Bikes | Best Pre-Owned Bikes</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f5f5f7; }
+    .navbar { background: #000000dd !important; backdrop-filter: blur(12px); }
+    .navbar-brand { font-weight: 800; font-size: 1.8rem; background: linear-gradient(135deg, #FFD966, #FFB347); -webkit-background-clip: text; background-clip: text; color: transparent !important; }
+    .nav-link { font-weight: 600; color: #f1f1f1 !important; }
+    .nav-link:hover, .nav-link.active { color: #FFB347 !important; }
+    .page-header { background: linear-gradient(135deg, #2c2c2c, #1a1a1a); color: white; padding: 120px 0 60px; margin-top: 70px; }
+    .bike-card { border-radius: 28px; overflow: hidden; transition: 0.3s; background: white; border: none; box-shadow: 0 12px 28px rgba(0,0,0,0.08); height: 100%; }
+    .bike-card:hover { transform: translateY(-5px); }
+    .card-img-top { height: 210px; object-fit: cover; }
+    .price { font-weight: 800; font-size: 1.5rem; color: #d35400; }
+    .used-badge { background: #7f8c8d; color: white; border-radius: 30px; padding: 4px 12px; font-size: 0.8rem; font-weight: 600; }
+    footer { background: #0c0c0c; color: #ccc; border-top-left-radius: 36px; border-top-right-radius: 36px; margin-top: 60px; }
+    .social-icon { background: #2c2c2c; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; color: #FFB347; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg fixed-top py-3">
+  <div class="container">
+    <a class="navbar-brand" href="index.html">⚡ SHIVAM MOTO</a>
+    <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarMain">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-2">
+        <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="new-bikes.html">New Bikes</a></li>
+        <li class="nav-item"><a class="nav-link active" href="old-bikes.html">Old Bikes</a></li>
+        <li class="nav-item"><a class="nav-link" href="exchange.html">Exchange</a></li>
+        <li class="nav-item"><a class="nav-link text-warning" href="admin.html"><i class="fas fa-lock"></i> Admin Panel</a></li>
+      </ul>
+      <a href="exchange.html" class="btn btn-sm btn-outline-warning ms-3 px-3 rounded-pill">Sell / Exchange</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="container">
+    <h1 class="display-4 fw-bold">🔄 Quality Pre-Owned Bikes</h1>
+    <p class="lead">Certified, serviced & ready to ride | 6 months warranty on all used bikes</p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row g-4" id="bikes-container">
+    <div class="text-center py-5">
+      <div class="spinner-border text-dark" role="status"></div>
+      <p class="mt-2 text-muted">Loading pre-owned bikes...</p>
+    </div>
+  </div>
+</div>
+
+<footer class="pt-5 pb-4">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 mb-4"><h3 class="text-white">⚡ SHIVAM MOTO</h3><p>Quality pre-owned bikes with warranty.</p></div>
+      <div class="col-md-2 mb-4"><h5 class="text-white">Explore</h5><ul class="list-unstyled"><li><a href="new-bikes.html" class="text-secondary">New Bikes</a></li><li><a href="old-bikes.html" class="text-secondary">Old Bikes</a></li><li><a href="exchange.html" class="text-secondary">Exchange</a></li></ul></div>
+      <div class="col-md-3 mb-4"><h5 class="text-white">Contact</h5><p><i class="fas fa-phone-alt"></i> +91 98765 43210</p></div>
+    </div>
+    <p class="text-center text-secondary">© 2026 Shivam Moto | Used Bikes Division</p>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  async function loadOldBikes() {
+    try {
+      const resp = await fetch('/api/bikes/old');
+      const bikes = await resp.json();
+      const container = document.getElementById('bikes-container');
+      
+      if (bikes.length === 0) {
+        container.innerHTML = '<div class="col-12 text-center text-muted py-5"><h4>No pre-owned bikes currently listed.</h4></div>';
+        return;
+      }
+      
+      container.innerHTML = bikes.map(bike => `
+        <div class="col-md-6 col-lg-4">
+          <div class="bike-card card h-100">
+            <img src="${bike.image_url}" class="card-img-top" alt="${bike.title}">
+            <div class="card-body">
+              ${bike.badge ? `<span class="used-badge mb-2">${bike.badge}</span>` : ''}
+              <h4 class="fw-bold ${bike.badge ? 'mt-2' : ''}">${bike.title}</h4>
+              <p class="price">${bike.price}</p>
+              ${bike.info ? `<p>${bike.info}</p>` : ''}
+              <a href="https://wa.me/919876543210?text=Hi,%20I%20am%20interested%20in%20your%20pre-owned%20bike:%20${encodeURIComponent(bike.title)}" target="_blank" class="btn btn-outline-dark rounded-pill w-100">Enquire Now</a>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    } catch (e) {
+      console.error('Error loading bikes:', e);
+      document.getElementById('bikes-container').innerHTML = '<div class="col-12 text-center text-danger py-5">Error loading data.</div>';
+    }
+  }
+  
+  loadOldBikes();
+</script>
+</body>
+</html>
