@@ -10,6 +10,13 @@
         body { font-family: 'Inter', sans-serif; background: #f4f6f9; padding-top: 50px; }
         .admin-card { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .form-label { font-weight: 600; }
+
+        @media (max-width: 768px) {
+            body { padding-top: 20px; }
+            .admin-card { padding: 20px 15px; }
+            h2 { font-size: 1.5rem; text-align: center; }
+            .d-flex { flex-direction: column; gap: 10px; text-align: center; }
+        }
     </style>
 </head>
 <body>
@@ -82,6 +89,11 @@
                             <label class="form-label">Additional Info (Optional)</label>
                             <input type="text" class="form-control" name="info" placeholder="e.g. 2026 | Petrol | 70 km/l">
                         </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description (Optional)</label>
+                        <textarea class="form-control" name="description" rows="3" placeholder="Enter detailed bike description..."></textarea>
                     </div>
 
                     <div class="mb-3">

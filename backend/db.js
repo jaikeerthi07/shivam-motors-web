@@ -19,6 +19,7 @@ pool.query(`
     category VARCHAR(255) NOT NULL,
     badge VARCHAR(255),
     info VARCHAR(255),
+    description TEXT,
     image_url VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )
@@ -26,7 +27,19 @@ pool.query(`
   if (err) {
     console.error('Error creating bikes table:', err);
   } else {
-    console.log('Bikes table is ready.');
+    // Ensure description column exists for existing tables
+    pool.query("SHOW COLUMNS FROM bikes LIKE 'description'", (err, rows) => {
+      if (err) {
+        console.error('Error checking for description column:', err);
+      } else if (rows.length === 0) {
+        pool.query('ALTER TABLE bikes ADD COLUMN description TEXT', (alterErr) => {
+          if (alterErr) console.error('Error adding description column:', alterErr);
+          else console.log('Description column added successfully.');
+        });
+      } else {
+        console.log('Bikes table is ready and up to date.');
+      }
+    });
   }
 });
 

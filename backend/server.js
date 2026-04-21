@@ -83,7 +83,7 @@ app.post('/api/admin/bikes', upload.single('photo'), async (req, res) => {
       return res.status(401).json({ error: 'Unauthorized access. Valid token required.' });
     }
 
-    const { title, price, category, badge, info } = req.body;
+    const { title, price, category, badge, info, description } = req.body;
     
     if (!req.file) {
       return res.status(400).json({ error: 'Photo is required' });
@@ -92,11 +92,45 @@ app.post('/api/admin/bikes', upload.single('photo'), async (req, res) => {
     const imageUrl = '/uploads/' + req.file.filename;
 
     const [result] = await db.query(
-      'INSERT INTO bikes (title, price, category, badge, info, image_url) VALUES (?, ?, ?, ?, ?, ?)',
-      [title, price, category, badge || null, info || null, imageUrl]
+      'INSERT INTO bikes (title, price, category, badge, info, description, image_url) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [title, price, category, badge || null, info || null, description || null, imageUrl]
     );
 
     res.status(201).json({ id: result.insertId, message: 'Bike added successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Database error' });
+  }
+});
+
+// API Endpoint to delete a bike and its photo
+app.delete('/api/admin/bikes/:id', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || authHeader !== `Bearer ${currentAdminToken}`) {
+      return res.status(401).json({ error: 'Unauthorized access. Valid token required.' });
+    }
+
+    const bikeId = req.params.id;
+    
+    const [rows] = await db.query('SELECT image_url FROM bikes WHERE id = ?', [bikeId]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Bike not found' });
+    }
+    
+    // Delete from database
+    await db.query('DELETE FROM bikes WHERE id = ?', [bikeId]);
+    
+    // Delete the image file if it exists
+    const imagePath = rows[0].image_url;
+    if (imagePath && imagePath.startsWith('/uploads/')) {
+      const fullPath = path.join(__dirname, '../sm', imagePath);
+      if (fs.existsSync(fullPath)) {
+        fs.unlinkSync(fullPath);
+      }
+    }
+    
+    res.json({ message: 'Bike deleted successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Database error' });
