@@ -21,20 +21,30 @@ pool.query(`
     info VARCHAR(255),
     description TEXT,
     image_url VARCHAR(255) NOT NULL,
+    status VARCHAR(20) DEFAULT 'unsold',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )
 `, (err, results) => {
   if (err) {
     console.error('Error creating bikes table:', err);
   } else {
-    // Ensure description column exists for existing tables
+    // Ensure description and status columns exist for existing tables
     pool.query("SHOW COLUMNS FROM bikes LIKE 'description'", (err, rows) => {
-      if (err) {
-        console.error('Error checking for description column:', err);
-      } else if (rows.length === 0) {
+      if (!err && rows.length === 0) {
         pool.query('ALTER TABLE bikes ADD COLUMN description TEXT', (alterErr) => {
           if (alterErr) console.error('Error adding description column:', alterErr);
           else console.log('Description column added successfully.');
+        });
+      }
+    });
+
+    pool.query("SHOW COLUMNS FROM bikes LIKE 'status'", (err, rows) => {
+      if (err) {
+        console.error('Error checking for status column:', err);
+      } else if (rows.length === 0) {
+        pool.query("ALTER TABLE bikes ADD COLUMN status VARCHAR(20) DEFAULT 'unsold'", (alterErr) => {
+          if (alterErr) console.error('Error adding status column:', alterErr);
+          else console.log('Status column added successfully.');
         });
       } else {
         console.log('Bikes table is ready and up to date.');

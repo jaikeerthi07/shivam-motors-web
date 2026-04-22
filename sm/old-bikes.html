@@ -26,12 +26,14 @@
     }
 
     .navbar-brand {
-      font-weight: 800;
-      font-size: 1.8rem;
-      background: linear-gradient(135deg, #FFD966, #FFB347);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent !important;
+      padding: 0;
+    }
+
+    .navbar-logo {
+      height: 70px;
+      width: auto;
+      object-fit: contain;
+      border-radius: 50%;
     }
 
     .nav-link {
@@ -136,6 +138,34 @@
       color: white;
     }
 
+    /* Sold Out Styles */
+    .sold-container {
+      position: relative;
+    }
+
+    .sold-badge-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-15deg);
+      background: rgba(220, 53, 69, 0.95);
+      color: white;
+      padding: 8px 25px;
+      font-weight: 800;
+      font-size: 1.4rem;
+      border: 2px solid white;
+      border-radius: 5px;
+      z-index: 10;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      pointer-events: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .sold-img {
+      filter: grayscale(0.8) opacity(0.6);
+    }
+
     @media (max-width: 768px) {
       .page-header {
         padding: 80px 0 40px;
@@ -148,6 +178,36 @@
       .bike-card {
         margin-bottom: 20px;
       }
+      
+      footer {
+        text-align: center;
+      }
+      footer .col-md-2, footer .col-md-3, footer .col-md-4 {
+        margin-bottom: 30px !important;
+      }
+      footer img {
+        height: 60px !important;
+      }
+    }
+
+    @media (max-width: 991px) {
+      .navbar-collapse {
+        background: rgba(15, 15, 15, 0.98);
+        padding: 20px;
+        border-radius: 16px;
+        margin-top: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      }
+      .nav-link {
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+      }
+      .nav-link:last-child {
+        border-bottom: none;
+      }
+      .navbar-logo {
+        height: 50px;
+      }
     }
   </style>
 </head>
@@ -156,7 +216,9 @@
 
   <nav class="navbar navbar-expand-lg fixed-top py-3">
     <div class="container">
-      <a class="navbar-brand" href="admin.html">⚡ SHIVAM MOTO</a>
+      <a class="navbar-brand" href="admin.html">
+        <img src="shivam motor logo.jpeg" alt="Shivam Moto Logo" class="navbar-logo">
+      </a>
       <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -168,7 +230,7 @@
 
 
         </ul>
-        <a href="exchange.html" class="btn btn-sm btn-outline-light ms-3 px-3 rounded-pill">Sell / Exchange</a>
+        <a href="exchange.html" class="btn btn-sm btn-outline-light mt-3 mt-lg-0 ms-lg-3 px-3 rounded-pill d-block d-lg-inline-block text-center">Sell / Exchange</a>
       </div>
     </div>
   </nav>
@@ -193,8 +255,11 @@
     <div class="container">
       <div class="row">
         <div class="col-md-4 mb-4">
-          <h3 class="text-white">⚡ SHIVAM MOTO</h3>
+          <a href="admin.html">
+            <img src="shivam motor logo.jpeg" alt="Shivam Moto Logo" style="height: 80px; border-radius: 50%; margin-bottom: 20px;">
+          </a>
           <p>Quality pre-owned bikes with warranty.</p>
+          <div><a href="#" class="social-icon me-2"><i class="fab fa-facebook-f"></i></a><a href="https://www.instagram.com/shivam_moto_official?igsh=MWthNWlsZTZsNzJseg%3D%3D&utm_source=qr" target="_blank" rel="noopener" class="social-icon me-2"><i class="fab fa-instagram"></i></a></div>
         </div>
         <div class="col-md-2 mb-4">
           <h5 class="text-white">Explore</h5>
@@ -256,32 +321,82 @@
           return;
         }
 
-        container.innerHTML = bikes.map(bike => `
-        <div class="col-md-6 col-lg-4">
-          <div class="bike-card card h-100">
-            <img src="${bike.image_url}" class="card-img-top" alt="${bike.title}">
-            <div class="card-body">
-              ${bike.badge ? `<span class="used-badge mb-2">${bike.badge}</span>` : ''}
-              <h4 class="fw-bold ${bike.badge ? 'mt-2' : ''}">${bike.title}</h4>
-              <p class="price">${bike.price}</p>
-              ${bike.info ? `<p class="mb-1 fw-semibold text-muted small">${bike.info}</p>` : ''}
-              ${bike.description ? `
-                <p class="small text-muted mb-1" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">${bike.description}</p>
-                <button class="btn btn-link btn-sm p-0 mb-3 text-warning text-decoration-none fw-bold" onclick='showBikeDetails(${JSON.stringify(bike).replace(/'/g, "&apos;")})'>Read More</button>
-              ` : '<div class="mb-3"></div>'}
-              <a href="https://wa.me/919876543210?text=Hi,%20I%20am%20interested%20in%20your%20pre-owned%20bike:%20${encodeURIComponent(bike.title)}" target="_blank" class="btn btn-outline-dark rounded-pill w-100">Enquire Now</a>
-              ${isAdmin ? `<button onclick="deleteBike(${bike.id})" class="btn btn-danger btn-sm mt-3 w-100"><i class="fas fa-trash-alt"></i> Delete</button>` : ''}
+        container.innerHTML = bikes.map(bike => {
+          const isSold = bike.status === 'sold';
+          return `
+          <div class="col-md-6 col-lg-4">
+            <div class="bike-card card h-100">
+              <div class="sold-container">
+                <img src="${bike.image_url}" class="card-img-top ${isSold ? 'sold-img' : ''}" alt="${bike.title}">
+                ${isSold ? '<div class="sold-badge-overlay">Sold Out</div>' : ''}
+              </div>
+              <div class="card-body">
+                ${bike.badge ? `<span class="used-badge mb-2">${bike.badge}</span>` : ''}
+                <h4 class="fw-bold ${bike.badge ? 'mt-2' : ''}">${bike.title}</h4>
+                <p class="price">${bike.price}</p>
+                ${bike.info ? `<p class="mb-1 fw-semibold text-muted small">${bike.info}</p>` : ''}
+                ${bike.description ? `
+                  <p class="small text-muted mb-1" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">${bike.description}</p>
+                  <button class="btn btn-link btn-sm p-0 mb-3 text-warning text-decoration-none fw-bold" onclick="window.showBikeDetails(${JSON.stringify(bike).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&quot;/g, '&quot;').replace(/'/g, '&#39;').replace(/\"/g, '&quot;')})">Read More</button>
+                ` : '<div class="mb-3"></div>'}
+                
+                ${isSold ? 
+                  `<button class="btn btn-secondary rounded-pill w-100 disabled">Sold Out</button>` :
+                  `<a href="https://wa.me/919876543210?text=Hi,%20I%20am%20interested%20in%20your%20pre-owned%20bike:%20${encodeURIComponent(bike.title)}" target="_blank" class="btn btn-outline-dark rounded-pill w-100">Enquire Now</a>`
+                }
+                ${isAdmin ? `<button data-delete-id="${bike.id}" class="btn btn-danger btn-sm mt-3 w-100 delete-bike-btn"><i class="fas fa-trash-alt"></i> Delete</button>` : ''}
+              </div>
             </div>
-          </div>
-        </div>
-      `).join('');
+          </div>`;
+        }).join('');
       } catch (e) {
         console.error('Error loading bikes:', e);
         document.getElementById('bikes-container').innerHTML = '<div class="col-12 text-center text-danger py-5">Error loading data.</div>';
       }
     }
+    
+    // GLOBAL DELETE HANDLER
+    document.addEventListener('click', async function(e) {
+      const btn = e.target.closest('.delete-bike-btn');
+      if (!btn) return;
+      
+      const id = btn.getAttribute('data-delete-id');
+      if (!id) return;
 
-    function showBikeDetails(bike) {
+      if (!confirm('Are you sure you want to delete this bike?')) return;
+      
+      const token = localStorage.getItem('adminToken');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+
+      try {
+        const res = await fetch(`/api/admin/bikes/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (res.ok) {
+          alert('Bike deleted successfully');
+          location.reload();
+        } else {
+          const data = await res.json();
+          alert(data.error || 'Failed to delete bike');
+          if (res.status === 401) {
+            localStorage.removeItem('adminToken');
+            location.reload();
+          }
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete';
+        }
+      } catch (err) {
+        console.error('Delete error:', err);
+        alert('Error connecting to server');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete';
+      }
+    });
+
+    window.showBikeDetails = function(bike) {
       document.getElementById('modalBikeTitle').textContent = bike.title;
       document.getElementById('modalBikePrice').textContent = bike.price;
       document.getElementById('modalBikeImg').src = bike.image_url;
@@ -304,27 +419,7 @@
 
     loadOldBikes();
 
-    async function deleteBike(id) {
-      if (!confirm('Are you sure you want to delete this bike?')) return;
-      const token = localStorage.getItem('adminToken');
-      try {
-        const res = await fetch(`/api/admin/bikes/${id}`, {
-          method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (res.ok) {
-          alert('Bike deleted successfully');
-          location.reload();
-        } else {
-          const data = await res.json();
-          alert(data.error || 'Failed to delete bike');
-          if (res.status === 401) localStorage.removeItem('adminToken');
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Error deleting bike');
-      }
-    }
+    // deleteBike removed in favor of global listener
   </script>
 
   <a href="https://wa.me/919876543210?text=Hi!%20I%20have%20an%20enquiry." class="whatsapp-float" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">

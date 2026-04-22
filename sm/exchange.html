@@ -26,12 +26,14 @@
     }
 
     .navbar-brand {
-      font-weight: 800;
-      font-size: 1.8rem;
-      background: linear-gradient(135deg, #FFD966, #FFB347);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent !important;
+      padding: 0;
+    }
+
+    .navbar-logo {
+      height: 70px;
+      width: auto;
+      object-fit: contain;
+      border-radius: 50%;
     }
 
     .nav-link {
@@ -91,6 +93,22 @@
       margin-top: 70px;
     }
 
+    .social-icon {
+      background: #2c2c2c;
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: #FFB347;
+      text-decoration: none;
+    }
+    .social-icon:hover {
+      background: #FFB347;
+      color: #000;
+    }
+
     .whatsapp-float {
       position: fixed;
       width: 60px;
@@ -137,6 +155,36 @@
       .p-5 {
         padding: 30px 20px !important;
       }
+      
+      footer {
+        text-align: center;
+      }
+      footer .col-md-2, footer .col-md-3, footer .col-md-4 {
+        margin-bottom: 30px !important;
+      }
+      footer img {
+        height: 60px !important;
+      }
+    }
+
+    @media (max-width: 991px) {
+      .navbar-collapse {
+        background: rgba(15, 15, 15, 0.98);
+        padding: 20px;
+        border-radius: 16px;
+        margin-top: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      }
+      .nav-link {
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+      }
+      .nav-link:last-child {
+        border-bottom: none;
+      }
+      .navbar-logo {
+        height: 50px;
+      }
     }
   </style>
 </head>
@@ -145,7 +193,9 @@
 
   <nav class="navbar navbar-expand-lg fixed-top py-3">
     <div class="container">
-      <a class="navbar-brand" href="admin.html">⚡ SHIVAM MOTO</a>
+      <a class="navbar-brand" href="admin.html">
+        <img src="shivam motor logo.jpeg" alt="Shivam Moto Logo" class="navbar-logo">
+      </a>
       <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -157,7 +207,7 @@
 
 
         </ul>
-        <a href="exchange.html" class="btn btn-sm btn-outline-light ms-3 px-3 rounded-pill">Sell / Exchange</a>
+        <a href="exchange.html" class="btn btn-sm btn-outline-light mt-3 mt-lg-0 ms-lg-3 px-3 rounded-pill d-block d-lg-inline-block text-center">Sell / Exchange</a>
       </div>
     </div>
   </nav>
@@ -232,8 +282,11 @@
     <div class="container">
       <div class="row">
         <div class="col-md-4 mb-4">
-          <h3 class="text-white">⚡ SHIVAM MOTO</h3>
+          <a href="admin.html">
+            <img src="shivam motor logo.jpeg" alt="Shivam Moto Logo" style="height: 80px; border-radius: 50%; margin-bottom: 20px;">
+          </a>
           <p>Best exchange deals in town.</p>
+          <div><a href="#" class="social-icon me-2"><i class="fab fa-facebook-f"></i></a><a href="https://www.instagram.com/shivam_moto_official?igsh=MWthNWlsZTZsNzJseg%3D%3D&utm_source=qr" target="_blank" rel="noopener" class="social-icon me-2"><i class="fab fa-instagram"></i></a></div>
         </div>
         <div class="col-md-2 mb-4">
           <h5 class="text-white">Quick Links</h5>

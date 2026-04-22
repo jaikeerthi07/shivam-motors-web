@@ -7,7 +7,8 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 // Generate a runtime session token exclusively for this boot cycle
-let currentAdminToken = crypto.randomBytes(16).toString('hex');
+// Use a static token for development to avoid session loss on server restart
+let currentAdminToken = 'shivadmin_secret_token_2026';
 
 const app = express();
 const PORT = 3000;
@@ -83,7 +84,7 @@ app.post('/api/admin/bikes', upload.single('photo'), async (req, res) => {
       return res.status(401).json({ error: 'Unauthorized access. Valid token required.' });
     }
 
-    const { title, price, category, badge, info, description } = req.body;
+    const { title, price, category, badge, info, description, status } = req.body;
     
     if (!req.file) {
       return res.status(400).json({ error: 'Photo is required' });
@@ -92,8 +93,8 @@ app.post('/api/admin/bikes', upload.single('photo'), async (req, res) => {
     const imageUrl = '/uploads/' + req.file.filename;
 
     const [result] = await db.query(
-      'INSERT INTO bikes (title, price, category, badge, info, description, image_url) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [title, price, category, badge || null, info || null, description || null, imageUrl]
+      'INSERT INTO bikes (title, price, category, badge, info, description, image_url, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [title, price, category, badge || null, info || null, description || null, imageUrl, status || 'unsold']
     );
 
     res.status(201).json({ id: result.insertId, message: 'Bike added successfully' });
@@ -106,8 +107,10 @@ app.post('/api/admin/bikes', upload.single('photo'), async (req, res) => {
 // API Endpoint to delete a bike and its photo
 app.delete('/api/admin/bikes/:id', async (req, res) => {
   try {
+    console.log(`Attempting to delete bike ID: ${req.params.id}`);
     const authHeader = req.headers.authorization;
     if (!authHeader || authHeader !== `Bearer ${currentAdminToken}`) {
+      console.log('Delete failed: Unauthorized');
       return res.status(401).json({ error: 'Unauthorized access. Valid token required.' });
     }
 
@@ -115,11 +118,13 @@ app.delete('/api/admin/bikes/:id', async (req, res) => {
     
     const [rows] = await db.query('SELECT image_url FROM bikes WHERE id = ?', [bikeId]);
     if (rows.length === 0) {
+      console.log(`Delete failed: Bike ${bikeId} not found`);
       return res.status(404).json({ error: 'Bike not found' });
     }
     
     // Delete from database
     await db.query('DELETE FROM bikes WHERE id = ?', [bikeId]);
+    console.log(`Bike ${bikeId} deleted from database`);
     
     // Delete the image file if it exists
     const imagePath = rows[0].image_url;
@@ -127,12 +132,13 @@ app.delete('/api/admin/bikes/:id', async (req, res) => {
       const fullPath = path.join(__dirname, '../sm', imagePath);
       if (fs.existsSync(fullPath)) {
         fs.unlinkSync(fullPath);
+        console.log(`Image file deleted: ${fullPath}`);
       }
     }
     
     res.json({ message: 'Bike deleted successfully' });
   } catch (error) {
-    console.error(error);
+    console.error('Error in DELETE /api/admin/bikes/:id:', error);
     res.status(500).json({ error: 'Database error' });
   }
 });
