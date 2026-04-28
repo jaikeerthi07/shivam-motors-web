@@ -41,11 +41,9 @@ async def admin_login(request: Request):
 app.include_router(bikes.router, prefix="/api")
 app.include_router(valuations.router, prefix="/api")
 
-# Serve static files from the 'sm' folder (frontend)
-# and 'sm/uploads' for images
-# In Node: app.use(express.static(path.join(__dirname, '../sm')));
-sm_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../sm"))
-app.mount("/", StaticFiles(directory=sm_dir, html=True), name="static")
+# Static files are handled by Vercel's CDN (configured in vercel.json)
+# sm_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../sm"))
+# app.mount("/", StaticFiles(directory=sm_dir, html=True), name="static")
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=3000)
+    uvicorn.run("index:app", host="0.0.0.0", port=3000, reload=True)

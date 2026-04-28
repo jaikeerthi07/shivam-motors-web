@@ -4,10 +4,10 @@ import os
 
 # Database configuration
 db_config = {
-    "host": "localhost",
-    "user": "root",
-    "password": "jaikeerthi07a",
-    "database": "shivmotors"
+    "host": os.environ.get("DB_HOST", "localhost"),
+    "user": os.environ.get("DB_USER", "root"),
+    "password": os.environ.get("DB_PASSWORD", "jaikeerthi07a"),
+    "database": os.environ.get("DB_NAME", "shivmotors")
 }
 
 # Create a connection pool
